@@ -190,9 +190,9 @@ export default function PdfViewer() {
         </div>
 
         {/* Content */}
-        <div className="flex-grow flex flex-col lg:flex-row gap-4 overflow-hidden">
+        <div className="flex-grow flex flex-col lg:flex-row gap-4 lg:overflow-hidden overflow-y-auto">
           {/* PDF Viewer */}
-          <div className="flex-grow bg-[#112240] rounded-lg shadow-lg overflow-hidden border border-[#233554] relative">
+          <div className="flex-grow bg-[#112240] rounded-lg shadow-lg overflow-hidden border border-[#233554] relative min-h-[60vh] lg:min-h-0">
             <iframe
               src={selectedBook.pdfUrl}
               title={selectedBook.title}
