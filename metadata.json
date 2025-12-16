@@ -1,0 +1,5 @@
+{
+  "name": "Elia's Personal Dashboard",
+  "description": "A personal school dashboard with a minimal, navy-themed aesthetic for managing tasks, notes, and documents. It features a calendar, a planner, and a PDF viewer, with password protection for private sections.",
+  "requestFramePermissions": []
+}
