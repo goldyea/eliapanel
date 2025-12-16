@@ -101,12 +101,15 @@ export default function PdfViewer() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Reset state when book changes
   useEffect(() => {
     setCurrentChapterIndex(0);
     setIsPlaying(false);
+    setPlaybackRate(1.0); // Reset speed
   }, [selectedBook]);
 
   // Handle Audio Playback changes
@@ -121,6 +124,20 @@ export default function PdfViewer() {
       }
     }
   }, [isPlaying, currentChapterIndex]);
+
+  // Handle Playback Rate
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate]);
+
+  const changePlaybackRate = (rate: number) => {
+    setPlaybackRate(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  };
 
   const handleChapterSelect = (index: number) => {
     setCurrentChapterIndex(index);
@@ -190,7 +207,7 @@ export default function PdfViewer() {
         </div>
 
         {/* Content */}
-        <div className="flex-grow flex flex-col lg:flex-row gap-4 lg:overflow-hidden overflow-y-auto">
+        <div className="flex-grow flex flex-col lg:flex-row gap-4 overflow-visible">
           {/* PDF Viewer */}
           <div className="flex-grow bg-[#112240] rounded-lg shadow-lg overflow-hidden border border-[#233554] relative min-h-[60vh] lg:min-h-0">
             <iframe
@@ -202,8 +219,8 @@ export default function PdfViewer() {
 
           {/* Audio Player Sidebar (if chapters exist) */}
           {selectedBook.chapters && (
-            <div className="w-full lg:w-80 flex-shrink-0 flex flex-col bg-[#112240] rounded-lg border border-[#233554] overflow-hidden">
-              <div className="p-4 border-b border-[#233554] bg-[#0a192f]">
+            <div className="w-full lg:w-80 flex-shrink-0 flex flex-col bg-[#112240] rounded-lg border border-[#233554] overflow-visible">
+              <div className="p-4 border-b border-[#233554] bg-[#0a192f] rounded-t-lg overflow-visible">
                 <h2 className="text-[#ccd6f6] font-semibold mb-2 flex items-center">
                   <span>Audiobook</span>
                   {isPlaying && (
@@ -246,6 +263,30 @@ export default function PdfViewer() {
                     </button>
                   </div>
 
+                  {/* Speed Slider */}
+                  <div className="w-full">
+                    <div className="text-[10px] text-[#8892b0] text-center mb-1">
+                      Speed: {playbackRate}x
+                    </div>
+                    <div className="flex items-center justify-center gap-1 flex-wrap">
+                      {[0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0].map(
+                        (rate) => (
+                          <button
+                            key={rate}
+                            onClick={() => changePlaybackRate(rate)}
+                            className={`px-2 py-0.5 text-[10px] font-mono rounded transition-colors ${
+                              playbackRate === rate
+                                ? "bg-[#64ffda] text-[#0a192f] font-bold"
+                                : "text-[#8892b0] hover:bg-[#233554] hover:text-[#ccd6f6]"
+                            }`}
+                          >
+                            {rate}x
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+
                   <audio
                     ref={audioRef}
                     src={audioSrc}
@@ -256,7 +297,7 @@ export default function PdfViewer() {
               </div>
 
               {/* Chapter List */}
-              <div className="flex-grow overflow-y-auto p-2 space-y-1 custom-scrollbar">
+              <div className="flex-grow overflow-y-auto p-2 space-y-1 custom-scrollbar rounded-b-lg">
                 {selectedBook.chapters.map((chapter, index) => (
                   <button
                     key={index}
@@ -366,18 +407,25 @@ export default function PdfViewer() {
         .animate-fade-in {
           animation: fadeIn 0.4s ease-out;
         }
+        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
+          width: 4px; /* Thinner for sleek look */
+          height: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #0a192f; 
+          background: transparent; /* Cleaner track */
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #233554; 
-          border-radius: 5px;
+          border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #64ffda; 
+        }
+        /* Firefox support */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #233554 transparent;
         }
       `}</style>
     </div>
